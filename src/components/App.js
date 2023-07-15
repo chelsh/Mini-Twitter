@@ -24,7 +24,7 @@ function App() {
       ) : (
         "Initializing..."
       )}
-      <footer>&copy; {new Date().getFullYear()} Mini-Twitter </footer>
+      {/* <footer>&copy; {new Date().getFullYear()} Mini-Twitter </footer> */}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { dbService } from "fbase";
+import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
 
 const Twit = ({ twitObj, isOwner }) => {
@@ -8,6 +8,7 @@ const Twit = ({ twitObj, isOwner }) => {
     const sure = window.confirm("Are you sure you want to delete this twit?");
     if (sure) {
       await dbService.doc(`twits/${twitObj.id}`).delete();
+      await storageService.refFromURL(twitObj.attachmentUrl).delete();
     }
   };
   const toggleEditing = () => {
@@ -35,11 +36,14 @@ const Twit = ({ twitObj, isOwner }) => {
             />
             <input type="submit" value="Update Twit" />
           </form>
-          <button onClick={toggleEditing}>Cancle</button>
+          <button onClick={toggleEditing}>Cancel</button>
         </>
       ) : (
         <>
           <h4>{twitObj.text}</h4>
+          {twitObj.attachmentUrl && (
+            <img src={twitObj.attachmentUrl} width="50px" height="50px" />
+          )}
           {isOwner && (
             <>
               <button onClick={onDeleteClick}>Delete Twit</button>

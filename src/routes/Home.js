@@ -49,7 +49,6 @@ const Home = ({ userObj }) => {
       const attachmentUrl = await response.ref.getDownloadURL();
       twitObj.attachmentUrl = attachmentUrl;
     }
-
     await dbService.collection("twits").add(twitObj);
     setTwit("");
     setAttachment(null);

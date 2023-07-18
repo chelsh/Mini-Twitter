@@ -40,6 +40,8 @@ const Home = ({ userObj }) => {
       text: twit,
       createdAt: Date.now(),
       creatorId: userObj.uid,
+      creatorName: userObj.displayName,
+      creatorPhotoURL: userObj.photoURL,
     };
     if (attachment !== null) {
       const attachmentRef = storageService
@@ -58,7 +60,6 @@ const Home = ({ userObj }) => {
       target: { value },
     } = event;
     setTwit(value);
-    // equal to setTweet(event.target.value);
   };
   const onFileChange = (event) => {
     const {

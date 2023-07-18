@@ -10,10 +10,43 @@ const Profile = ({ userObj }) => {
   const [errorMassage, setErrorMassage] = useState("");
   const [isEditingPhoto, setIsEditingPhoto] = useState(false);
   const [newPhoto, setNewPhoto] = useState("");
+  const userProfile = {
+    displayName: userObj.displayName,
+    email: userObj.email,
+    emailVerified: userObj.emailVerified,
+    isAnonymous: userObj.isAnonymous,
+    phoneNumber: userObj.phoneNumber,
+    photoURL: userObj.photoURL,
+    providerData: userObj.providerData,
+    providerId: userObj.providerId,
+    refreshToken: userObj.refreshToken,
+    tenantId: userObj.tenantId,
+    uid: userObj.uid,
+  };
+
+  const onDefaultProfile = async () => {
+    if (userObj.displayName === null) {
+      await userObj.updateProfile({ displayName: userObj.email.split("@")[0] });
+    }
+    if (userProfile.photoURL === null) {
+      const defaultPhotoUrl = process.env.REACT_APP_DEFAULT_PROFILE_PHOTO_URL;
+      await userObj.updateProfile({
+        photoURL: defaultPhotoUrl,
+      });
+    }
+  };
+  onDefaultProfile();
+
+  useEffect(() => {
+    const usersBucket = dbService.collection("users");
+    usersBucket.doc(`user:${userProfile.uid}`).set(userProfile);
+  }, []);
+
   const onLogOutClick = () => {
     authService.signOut();
     history.push("/");
   };
+
   const getMyTwits = async () => {
     const twits = await dbService
       .collection("twits")
@@ -24,6 +57,7 @@ const Profile = ({ userObj }) => {
   useEffect(() => {
     getMyTwits();
   }, []);
+
   const toggleChangeName = () => {
     setIsEditingName((prev) => !prev);
   };
@@ -38,6 +72,10 @@ const Profile = ({ userObj }) => {
       setErrorMassage("Please write the name longer than 2 letters.");
     } else {
       await userObj.updateProfile({ displayName: newDisplayName });
+      const usersBucket = dbService.collection("users");
+      usersBucket
+        .doc(`user:${userProfile.uid}`)
+        .update({ displayName: newDisplayName });
       setErrorMassage("");
       toggleChangeName();
     }
@@ -62,18 +100,15 @@ const Profile = ({ userObj }) => {
   };
   const onSubmitPhoto = async (event) => {
     event.preventDefault();
-    console.log("newPhoto:", newPhoto);
     if (newPhoto !== "") {
-      const userPhoto = {
-        editedAt: Date.now(),
-        userId: userObj.uid,
-      };
       const photoRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
       const response = await photoRef.putString(newPhoto, "data_url");
-      const photoUrl = await response.ref.getDownloadURL();
-      userPhoto.photoUrl = photoUrl;
-      await dbService.collection("users").add(userPhoto);
-      await userObj.updateProfile({ photoURL: userPhoto.photoUrl });
+      const newPhotoURL = await response.ref.getDownloadURL();
+      await userObj.updateProfile({ photoURL: newPhotoURL });
+      const usersBucket = dbService.collection("users");
+      usersBucket
+        .doc(`user:${userProfile.uid}`)
+        .update({ photoURL: newPhotoURL });
       setNewPhoto("");
       toggleChangePhoto();
     } else {
@@ -82,14 +117,14 @@ const Profile = ({ userObj }) => {
       await userObj.updateProfile({
         photoURL: defaultPhotoUrl,
       });
+      const usersBucket = dbService.collection("users");
+      usersBucket
+        .doc(`user:${userProfile.uid}`)
+        .update({ photoURL: defaultPhotoUrl });
       setNewPhoto("");
       toggleChangePhoto();
     }
   };
-
-  useEffect(() => {
-    console.log("photo url:", userObj.photoURL);
-  }, [userObj.photoURL]);
 
   return (
     <>

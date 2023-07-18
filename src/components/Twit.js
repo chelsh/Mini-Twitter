@@ -40,7 +40,12 @@ const Twit = ({ twitObj, isOwner }) => {
         </>
       ) : (
         <>
-          <h4>{twitObj.text}</h4>
+          <span>
+            <h4>{twitObj.text}</h4>
+            <h6>{twitObj.createdAt}</h6>
+            <h6>{twitObj.creatorName}</h6>
+            <img src={twitObj.creatorPhotoURL} width="20px" height="20px" />
+          </span>
           {twitObj.attachmentUrl && (
             <img src={twitObj.attachmentUrl} width="50px" height="50px" />
           )}

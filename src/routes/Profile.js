@@ -136,28 +136,41 @@ const Profile = ({ userObj }) => {
   };
 
   return (
-    <>
+    <div className="container">
       <div>
-        <h2>{userObj.displayName}</h2>
         <img src={userObj.photoURL} width="150px" height="150px" />
+        <h2>{userObj.displayName}</h2>
       </div>
       {isEditingName ? (
         <>
-          <form onSubmit={onSubmitName}>
+          <form onSubmit={onSubmitName} className="profileForm">
             <input
               onChange={onChangeName}
               type="text"
               placeholder="Write your new user name"
               value={newDisplayName}
               required
+              className="formInput"
             />
-            <input type="submit" value="Edit" onSubmit={onSubmitName} />
-            <button onClick={toggleChangeName}>Cancel</button>
+            <input
+              type="submit"
+              value="Change"
+              onSubmit={onSubmitName}
+              className="formBtn"
+              style={{
+                marginTop: 10,
+              }}
+            />
+            <button onClick={toggleChangeName} className="formBtn cancelBtn">
+              Cancel
+            </button>
             {errorMassage}
           </form>
         </>
       ) : (
-        <button onClick={toggleChangeName}>Change user name</button>
+        <button onClick={toggleChangeName} className="formInput">
+          Change user name
+        </button>
       )}
       {isEditingPhoto ? (
         <>
@@ -173,9 +186,13 @@ const Profile = ({ userObj }) => {
           </form>
         </>
       ) : (
-        <button onClick={toggleChangePhoto}>Change user Photo</button>
+        <button onClick={toggleChangePhoto} className="formInput">
+          Change user Photo
+        </button>
       )}
-      <button onClick={onLogOutClick}>Sign Out</button>
+      <span className="formBtn cancelBtn logOut" onClick={onLogOutClick}>
+        Log Out
+      </span>
       <div>
         <h2>My Twits</h2>
         {myTwits.map((twit) => (
@@ -186,7 +203,7 @@ const Profile = ({ userObj }) => {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

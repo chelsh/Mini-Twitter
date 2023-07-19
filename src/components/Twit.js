@@ -1,5 +1,7 @@
-import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
+import { dbService, storageService } from "fbase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Twit = ({ twitObj, isOwner }) => {
   const getTime = (timeStamp) => {
@@ -37,41 +39,40 @@ const Twit = ({ twitObj, isOwner }) => {
   };
 
   return (
-    <div>
+    <div className="nweet">
       {isEditing ? (
         <>
-          <form onSubmit={submitTwit}>
+          <form onSubmit={submitTwit} className="container nweetEdit">
             <input
               type="text"
               placeholder="Edit your twit"
               value={newTwit}
               onChange={changeTwit}
-              required
+              className="formInput"
+              autoFocus
             />
-            <input type="submit" value="Update Twit" />
+            <input type="submit" value="Update Twit" className="formBtn" />
           </form>
-          <button onClick={toggleEditing}>Cancel</button>
+          <span onClick={toggleEditing} className="formBtn cancelBtn">
+            Cancel
+          </span>
         </>
       ) : (
         <>
-          <span>
-            <h4>{twitObj.text}</h4>
-            <h6>{time}</h6>
-            <h6>{twitObj.creatorName}</h6>
-            <img
-              src={twitObj.creatorPhotoURL}
-              width="20px"
-              objectheight="20px"
-            />
-          </span>
-          {twitObj.attachmentUrl && (
-            <img src={twitObj.attachmentUrl} width="50px" height="50px" />
-          )}
+          <h4>{twitObj.text}</h4>
+          <h6>{time}</h6>
+          <h6>{twitObj.creatorName}</h6>
+          <img src={twitObj.creatorPhotoURL} width="20px" objectheight="20px" />
+          {twitObj.attachmentUrl && <img src={twitObj.attachmentUrl} />}
           {isOwner && (
-            <>
-              <button onClick={onDeleteClick}>Delete</button>
-              <button onClick={toggleEditing}>Edit</button>
-            </>
+            <div class="nweet__actions">
+              <span onClick={onDeleteClick}>
+                <FontAwesomeIcon icon={faTrash} />
+              </span>
+              <span onClick={toggleEditing}>
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </span>
+            </div>
           )}
         </>
       )}

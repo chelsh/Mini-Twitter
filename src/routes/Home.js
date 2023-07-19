@@ -11,7 +11,7 @@ const Home = ({ userObj }) => {
   useEffect(() => {
     dbService
       .collection("twits")
-      .orderBy("createdAt")
+      .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => {
         const twitArray = snapshot.docs.map((doc) => ({
           id: doc.id,

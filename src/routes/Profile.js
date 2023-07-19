@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { authService, dbService, storageService } from "fbase";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import Twit from "components/Twit";
 
 const Profile = ({ userObj }) => {
   const history = useHistory();
@@ -10,6 +11,7 @@ const Profile = ({ userObj }) => {
   const [errorMassage, setErrorMassage] = useState("");
   const [isEditingPhoto, setIsEditingPhoto] = useState(false);
   const [newPhoto, setNewPhoto] = useState("");
+  const [myTwits, setMyTwits] = useState([]);
   const userProfile = {
     displayName: userObj.displayName,
     email: userObj.email,
@@ -50,12 +52,22 @@ const Profile = ({ userObj }) => {
   const getMyTwits = async () => {
     const twits = await dbService
       .collection("twits")
-      .where("creatorId", "==", userObj.uid) //filtering the user
       .orderBy("createdAt", "desc")
       .get();
+    return twits;
   };
   useEffect(() => {
-    getMyTwits();
+    dbService
+      .collection("twits")
+      .where("creatorId", "==", userObj.uid) //filtering the user
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) => {
+        const twitArray = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setMyTwits(twitArray);
+      });
   }, []);
 
   const toggleChangeName = () => {
@@ -167,6 +179,16 @@ const Profile = ({ userObj }) => {
         <button onClick={toggleChangePhoto}>Change user Photo</button>
       )}
       <button onClick={onLogOutClick}>Sign Out</button>
+      <div>
+        <h2>My Twits</h2>
+        {myTwits.map((twit) => (
+          <Twit
+            key={twit.id}
+            twitObj={twit}
+            isOwner={twit.creatorId === userObj.uid}
+          />
+        ))}
+      </div>
     </>
   );
 };

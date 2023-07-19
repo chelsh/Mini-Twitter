@@ -17,6 +17,7 @@ function App() {
       setInit(true);
     });
   }, []);
+
   return (
     <>
       {init ? (

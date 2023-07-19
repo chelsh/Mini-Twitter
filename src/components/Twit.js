@@ -2,13 +2,26 @@ import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
 
 const Twit = ({ twitObj, isOwner }) => {
+  const getTime = (timeStamp) => {
+    const inputTime = new Date(timeStamp);
+    const year = inputTime.getFullYear();
+    const month = inputTime.getMonth();
+    const date = inputTime.getDate();
+    const hour = inputTime.getHours();
+    const minute = inputTime.getMinutes();
+    return `${year}.${month}.${date}  ${hour}:${minute}`;
+  };
+  const time = getTime(twitObj.createdAt);
+
   const [isEditing, setIsEditing] = useState(false);
   const [newTwit, setNewTwit] = useState(twitObj.text);
   const onDeleteClick = async () => {
     const sure = window.confirm("Are you sure you want to delete this twit?");
     if (sure) {
       await dbService.doc(`twits/${twitObj.id}`).delete();
-      await storageService.refFromURL(twitObj.attachmentUrl).delete();
+      if (twitObj.attachmentUrl) {
+        await storageService.refFromURL(twitObj.attachmentUrl).delete();
+      }
     }
   };
   const toggleEditing = () => {
@@ -22,6 +35,7 @@ const Twit = ({ twitObj, isOwner }) => {
     dbService.doc(`twits/${twitObj.id}`).update({ text: newTwit });
     setIsEditing(false);
   };
+
   return (
     <div>
       {isEditing ? (
@@ -42,17 +56,21 @@ const Twit = ({ twitObj, isOwner }) => {
         <>
           <span>
             <h4>{twitObj.text}</h4>
-            <h6>{twitObj.createdAt}</h6>
+            <h6>{time}</h6>
             <h6>{twitObj.creatorName}</h6>
-            <img src={twitObj.creatorPhotoURL} width="20px" height="20px" />
+            <img
+              src={twitObj.creatorPhotoURL}
+              width="20px"
+              objectheight="20px"
+            />
           </span>
           {twitObj.attachmentUrl && (
             <img src={twitObj.attachmentUrl} width="50px" height="50px" />
           )}
           {isOwner && (
             <>
-              <button onClick={onDeleteClick}>Delete Twit</button>
-              <button onClick={toggleEditing}>Edit Twit</button>
+              <button onClick={onDeleteClick}>Delete</button>
+              <button onClick={toggleEditing}>Edit</button>
             </>
           )}
         </>

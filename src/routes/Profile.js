@@ -26,18 +26,22 @@ const Profile = ({ userObj }) => {
     uid: userObj.uid,
   };
 
-  const onDefaultProfile = async () => {
-    if (userObj.displayName === null) {
-      await userObj.updateProfile({ displayName: userObj.email.split("@")[0] });
-    }
-    if (userProfile.photoURL === null) {
-      const defaultPhotoUrl = process.env.REACT_APP_DEFAULT_PROFILE_PHOTO_URL;
-      await userObj.updateProfile({
-        photoURL: defaultPhotoUrl,
-      });
-    }
-  };
-  onDefaultProfile();
+  useEffect(() => {
+    const onDefaultProfile = async () => {
+      if (userObj.displayName === null) {
+        await userObj.updateProfile({
+          displayName: userObj.email.split("@")[0],
+        });
+      }
+      if (userProfile.photoURL === null) {
+        const defaultPhotoUrl = process.env.REACT_APP_DEFAULT_PROFILE_PHOTO_URL;
+        await userObj.updateProfile({
+          photoURL: defaultPhotoUrl,
+        });
+      }
+    };
+    onDefaultProfile();
+  }, []);
 
   useEffect(() => {
     const usersBucket = dbService.collection("users");
@@ -49,13 +53,6 @@ const Profile = ({ userObj }) => {
     history.push("/");
   };
 
-  const getMyTwits = async () => {
-    const twits = await dbService
-      .collection("twits")
-      .orderBy("createdAt", "desc")
-      .get();
-    return twits;
-  };
   useEffect(() => {
     dbService
       .collection("twits")
